@@ -1,0 +1,133 @@
+package ua.nure.order.server;
+
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ua.nure.order.entity.user.Role;
+import ua.nure.order.entity.user.User;
+import ua.nure.order.server.dao.UserDAO;
+import ua.nure.order.shared.Hash;
+import ua.nure.order.shared.UserValidator;
+import ua.nure.order.shared.Util;
+
+import java.io.IOException;
+import java.util.Map;
+
+/**
+ * Identify user by login and password. If it valid store user into session and
+ * redirect according user {@link Role}.
+ * 
+ * @param login
+ *            in request
+ * @param password
+ *            in request
+ * 
+ * @author engsyst
+ *
+ */
+public class Login extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private static final Logger log = LoggerFactory.getLogger(Login.class);
+	private static UserValidator<User> validator = new UserValidator<>();
+	private transient UserDAO dao = null;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Login() {
+        super();
+    }
+    
+    @Override
+	public void init() {
+    	log.trace("Login init start");
+    	ServletContext ctx = getServletContext();
+    	dao = (UserDAO) getServletContext().getAttribute("UserDao");
+    	ServletConfig conf = getServletConfig();
+    	String param = conf.getInitParameter("loginPattern");
+    	log.debug("loginPattern --> {}", param);
+    	if (param != null)
+    		validator.loginPattern = param;
+    	param = ctx.getInitParameter("passPattern");
+    	log.debug("passPattern --> {}", param);
+    	if (param != null)
+    		validator.passPattern = param;
+    	param = ctx.getInitParameter("errLoginMsg");
+    	log.debug("errLoginMsg --> {}", param);
+    	if (param != null)
+    		validator.errLoginMsg = param;
+    	param = ctx.getInitParameter("errPassMsg");
+    	log.debug("errPassMsg --> {}", param);
+    	if (param != null)
+    		validator.errPassMsg = param;
+    	log.trace("Login init finish");
+    }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
+		log.trace("doPost start");
+		HttpSession session = request.getSession();
+		String login = Util.getOrElse(request.getParameter("login"), "").trim();
+		log.debug("login --> {}", login);
+
+		String pass = Util.getOrElse(request.getParameter("password"), "");
+		// TODO remove in PRODUCTION
+		log.debug("password --> {}", pass);
+		
+		User user = new User(login, pass);
+		Map<String, String> errors = validator.validate(user);
+		if (!errors.isEmpty()) {
+			goBack(request, response, user, errors);
+			return;
+		}
+		try {
+			User u = dao.getUser(login);
+			if (u == null) {
+				errors.put("login", "Login or password incorrect");
+				goBack(request, response, user, errors);
+				return;
+			}
+			String hash = Hash.encode(pass);
+			if (!hash.equals(u.getPass())) {
+				log.debug("password incorrect --> " + hash + " | " + u.getPass());
+				u.setPass(null);
+				errors.put("login", "Login or password incorrect");
+				goBack(request, response, user, errors);
+				return;
+			}
+			user = u;
+		} catch (Exception e) {
+			log.debug("DAOException", e);
+			throw new ServletException(e.getMessage());
+		} 
+		session.removeAttribute("errors");
+		session.setAttribute("user", user);
+		log.debug("Set session attribute user --> {}", user);
+		if (user.getRole().equals(Role.client)) {
+			log.debug("Redirect to --> list.jsp");
+			response.sendRedirect("list.jsp");
+		} else {
+			log.debug("Redirect to --> orders.jsp");
+			response.sendRedirect("order/orders.jsp?search=newed");
+		}
+	}
+	
+	private void goBack(HttpServletRequest request, HttpServletResponse response, User user, Map<String, String> errors)
+			throws IOException {
+		HttpSession session = request.getSession();
+		session.setAttribute("user", user);
+		session.setAttribute("errors", errors);
+		log.debug("Redirect --> login.jsp");
+		response.sendRedirect("login.jsp");
+	}
+}
