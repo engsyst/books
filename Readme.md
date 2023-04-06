@@ -30,8 +30,8 @@ You can change the context path in `context` property of 'cargo-maven3-plugin' i
 
 #### Using IntellijIdea Community
 
-Open the project using maven nature. \
-You can use 'Using maven' approach to run it in IJ terminal.
+Open the project using maven nature. 
+- You can use 'Using maven' approach to run it in IJ terminal.
 
 Or 
 
@@ -42,8 +42,8 @@ Or
 
 #### Using Eclipse
 
-Import the project using 'Maven import' wizard. \
-You can use 'Using maven' approach to run it in Eclipse terminal.
+Import the project using 'Maven import' wizard.
+- You can use 'Using maven' approach to run it in Eclipse terminal.
 
 Or
 
