@@ -1,19 +1,13 @@
--- MySQL Workbench Forward Engineering
-
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+-- -----------------------------------------------------
+-- Schema books
+-- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `books_mvn` ;
 
 -- -----------------------------------------------------
 -- Schema books
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `books` ;
-
--- -----------------------------------------------------
--- Schema books
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `books` DEFAULT CHARACTER SET utf8 ;
-USE `books` ;
+CREATE SCHEMA IF NOT EXISTS `books_mvn` DEFAULT CHARACTER SET utf8 ;
+USE `books_mvn` ;
 
 -- -----------------------------------------------------
 -- Table `author`
@@ -194,33 +188,14 @@ CREATE TABLE IF NOT EXISTS `book_has_order` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-USE `books` ;
-
--- -----------------------------------------------------
--- Placeholder table for view `books`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `books` (`id` INT, `title` INT, `authors` INT, `isbn` INT, `price` INT, `count` INT, `category` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `sum_by_order`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sum_by_order` (`oid` INT, `osum` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `orders`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `orders` (`user_id` INT, `login` INT, `order_id` INT, `status` INT, `book_id` INT, `title` INT, `count` INT, `price` INT, `osum` INT, `delivery_id` INT);
 
 -- -----------------------------------------------------
 -- function concatauthors
 -- -----------------------------------------------------
-
-USE `books`;
 DROP function IF EXISTS `concatauthors`;
 
 DELIMITER $$
-USE `books`$$
-CREATE FUNCTION `concatauthors` (aid INT(11)) RETURNS VARCHAR(512)
+CREATE FUNCTION `concatauthors` (aid INT(11)) RETURNS VARCHAR(512) READS SQL DATA
 BEGIN
 	DECLARE done INT DEFAULT 0;
 	DECLARE k INT DEFAULT 0;
@@ -248,15 +223,11 @@ BEGIN
     RETURN retv;
 END
 $$
-
 DELIMITER ;
 
 -- -----------------------------------------------------
 -- View `books`
 -- -----------------------------------------------------
-DROP VIEW IF EXISTS `books` ;
-DROP TABLE IF EXISTS `books`;
-USE `books`;
 CREATE  OR REPLACE VIEW `books` AS SELECT book.id, book.title, concatauthors(book.id) as `authors`, book.isbn, book.price, book.count, category.title as category
   from book, category WHERE category.id = category_id;
 
@@ -264,18 +235,12 @@ CREATE  OR REPLACE VIEW `books` AS SELECT book.id, book.title, concatauthors(boo
 -- -----------------------------------------------------
 -- View `sum_by_order`
 -- -----------------------------------------------------
-DROP VIEW IF EXISTS `sum_by_order` ;
-DROP TABLE IF EXISTS `sum_by_order`;
-USE `books`;
 CREATE  OR REPLACE VIEW `sum_by_order` AS SELECT `order_id` `oid`, sum(`price` * `count`) `osum` FROM `book_has_order` GROUP BY `order_id`
 ;
 
 -- -----------------------------------------------------
 -- View `orders`
 -- -----------------------------------------------------
-DROP VIEW IF EXISTS `orders` ;
-DROP TABLE IF EXISTS `orders`;
-USE `books`;
 CREATE  OR REPLACE VIEW `orders` AS 
 SELECT 
         `order`.`user_id` `user_id`,
@@ -300,30 +265,21 @@ SELECT
             AND `order`.`id` = `sum_by_order`.`oid`
     ORDER BY `order`.`user_id` , `order`.`id` , `book`.`id`;
 
-USE `books`;
 
 DELIMITER $$
-
-USE `books`$$
 DROP TRIGGER IF EXISTS `book_has_order_BEFORE_INSERT` $$
-USE `books`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `books`.`book_has_order_BEFORE_INSERT` BEFORE INSERT ON `book_has_order` FOR EACH ROW
+CREATE DEFINER = CURRENT_USER TRIGGER `book_has_order_BEFORE_INSERT` BEFORE INSERT ON `book_has_order` FOR EACH ROW
 begin
 	SET @price = (select price from book where id = NEW.`book_id`);
     SET @newcount = (select count from book where id = NEW.`book_id`) - NEW.count;
     SET NEW.price = @price;
     UPDATE book SET book.count = @newcount where id = NEW.`book_id`;
 end$$
-
 DELIMITER ;
 
 DELIMITER $$
-
-USE `books`$$
-DROP TRIGGER IF EXISTS `books`.`order_AFTER_UPDATE` $$
-
-USE `books`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `books`.`order_AFTER_UPDATE` AFTER UPDATE ON `order` FOR EACH ROW
+DROP TRIGGER IF EXISTS `order_AFTER_UPDATE` $$
+CREATE DEFINER = CURRENT_USER TRIGGER `order_AFTER_UPDATE` AFTER UPDATE ON `order` FOR EACH ROW
 BEGIN
 	DECLARE done INT DEFAULT 0;
 	DECLARE ocount INT DEFAULT 0;
@@ -342,12 +298,8 @@ BEGIN
 	END IF;
 END;
 $$
-
 DELIMITER ;
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
 -- Data inserts

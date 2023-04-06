@@ -52,6 +52,6 @@ NONE  READ_COMMITTED  READ_UNCOMMITTED  REPEATABLE_READ SERIALIZABLE
 			driverClassName="com.mysql.cj.jdbc.Driver"
 			defaultAutoCommit="false"
 			defaultTransactionIsolation="READ_COMMITTED"
-			url="jdbc:mysql://localhost/books?useSSL=false"/>
+			url="jdbc:mysql://localhost/books_mvn?useSSL=false"/>
 			
 </Context>
