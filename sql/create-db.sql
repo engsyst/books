@@ -1,12 +1,12 @@
 -- -----------------------------------------------------
 -- Schema books
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `books_mvn`;
+-- DROP SCHEMA IF EXISTS `books_mvn`;
 
 -- -----------------------------------------------------
 -- Schema books
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `books_mvn` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA `books_mvn` DEFAULT CHARACTER SET utf8;
 USE `books_mvn` ;
 
 -- -----------------------------------------------------

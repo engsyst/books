@@ -11,7 +11,9 @@ Jetty servers was not tested.
 
 1. Create database using the script: [create-db.sql](sql/create-db.sql) \
    It can be done with 'MySqlWorkbench' or 'mysql' command line utility.
+   - The database name is: `books_mvn`
    - You can change the database name in the script if it is necessary.
+   > **Warning!** The script stops if a database with name `books_mvn` already exists.
 2. Check database connection properties in [context.xml](src/main/webapp/META-INF/context.xml)
    and change the connection url to your database name if it changed.
 
