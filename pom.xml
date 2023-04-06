@@ -147,7 +147,7 @@
 								<!-- Override location to point to the exploded webapp. -->
 								<location>${project.build.directory}/${app-name}</location>
 								<properties>
-									<context>${app-name}</context>
+									<context>/</context>
 								</properties>
 							</deployable>
 						</deployables>
