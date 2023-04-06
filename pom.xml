@@ -19,33 +19,20 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<!-- versions -->
-		<jaxb.version>4.0.0</jaxb.version>
-		<com.sun.xml.ws.version>4.0.0</com.sun.xml.ws.version>
+		<!--<jaxb.version>4.0.0</jaxb.version>-->
+		<!--<com.sun.xml.ws.version>4.0.0</com.sun.xml.ws.version>-->
 		<jakarta.el.version>4.0.0</jakarta.el.version>
-		<jakarta.servlet.jsp.jstl.version>3.0.0</jakarta.servlet.jsp.jstl.version>
+		<jakarta.servlet.jsp.jstl-api.version>3.0.0</jakarta.servlet.jsp.jstl-api.version>
+		<jakarta.servlet.jsp.jstl.version>3.0.1</jakarta.servlet.jsp.jstl.version>
+		<app-name>books_mvn</app-name>
 	</properties>
 
 	<dependencies>
-		<dependency>
+		<!--<dependency>
 			<groupId>jakarta.activation</groupId>
 			<artifactId>jakarta.activation-api</artifactId>
 			<version>2.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>${jaxb.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>${jaxb.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>${jaxb.version}</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- Java Web -->
 		<dependency>
@@ -63,13 +50,13 @@
 		<dependency>
 			<groupId>jakarta.el</groupId>
 			<artifactId>jakarta.el-api</artifactId>
-			<version>4.0.0</version>
+			<version>5.0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.servlet.jsp.jstl</groupId>
 			<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-			<version>${jakarta.servlet.jsp.jstl.version}</version>
+			<version>${jakarta.servlet.jsp.jstl-api.version}</version>
 			<!-- The scope must not be 'provided'. Tomcat 10 does not contain it -->
 		</dependency>
 		<dependency>
@@ -109,7 +96,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>books</finalName>
+		<finalName>${app-name}</finalName>
 		<pluginManagement>
 			<!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
 			<plugins>
@@ -142,23 +129,28 @@
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.8.2</version>
 				</plugin>
+				<!-- https://codehaus-cargo.github.io/cargo/Maven+3+Plugin.html -->
 				<plugin>
-					<groupId>org.apache.tomcat.maven</groupId>
-					<artifactId>tomcat7-maven-plugin</artifactId>
-					<version>2.2</version>
+					<groupId>org.codehaus.cargo</groupId>
+					<artifactId>cargo-maven3-plugin</artifactId>
+					<version>1.10.6</version>
 					<configuration>
-						<url>http://localhost:8080/manager/text</url>
-						<!-- FIXME change it to the tomcat login and password -->
-						<username>tomcat</username>
-						<password>tomcat</password>
-						<!-- FIXME change it to the project context path -->
-						<path>/${project.build.finalName}</path>
-						<mode>context</mode>
-						<contextFile>${project.basedir}/${project.build.finalName}.xml</contextFile>
-						<!-- The content of ${build.finalName}.xml
-						<Context docBase="your own absolute path to webapp dir" reloadable="true"/>
-						Before first deploy run maven goal: 'mvn war:inplace'
-						-->
+						<container>
+							<containerId>tomcat10x</containerId>
+							<type>embedded</type>
+						</container>
+						<deployables>
+							<deployable>
+								<groupId>org.codehaus.cargo</groupId>
+								<artifactId>simple-war</artifactId>
+								<type>war</type>
+								<!-- Override location to point to the exploded webapp. -->
+								<location>${project.build.directory}/${app-name}</location>
+								<properties>
+									<context>${app-name}</context>
+								</properties>
+							</deployable>
+						</deployables>
 					</configuration>
 				</plugin>
 			</plugins>

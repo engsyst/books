@@ -8,40 +8,9 @@
 
 package ua.nure.order.entity.book;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
-
 import ua.nure.order.entity.Entity;
 
-
-/**
- * <p>Java class for Author complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="Author">
- *   &lt;complexContent>
- *     &lt;extension base="{http://order.nure.ua/entity/}Entity">
- *       &lt;sequence>
- *         &lt;element name="title" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
- * </pre>
- * 
- * 
- */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Author", propOrder = {
-    "title"
-})
 public class Author extends Entity {
-
-	@XmlElement(required = true)
 	protected String title;
 
 	public Author() {

@@ -8,15 +8,10 @@
 
 package ua.nure.order.entity.book;
 
+import ua.nure.order.entity.Product;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
-
-import ua.nure.order.entity.Product;
 
 
 /**
@@ -56,27 +51,12 @@ import ua.nure.order.entity.Product;
  * 
  */
 @SuppressWarnings("serial")
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Book", propOrder = {
-    "title",
-    "author",
-    "isbn",
-    "price",
-    "category",
-    "count",
-    "description",
-    "cover",
-})
 public class Book extends Product {
 
-	@XmlElement(required = true)
     protected String title;
-    @XmlElement(required = true)
     protected List<Author> author;
     protected String isbn;
-    @XmlElement(required = true, defaultValue = "none")
     protected Category category;
-    @XmlElement(defaultValue = "0")
     protected int count;
     protected String description;
     protected String cover;

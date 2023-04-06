@@ -10,42 +10,6 @@ package ua.nure.order.entity;
 
 import java.io.Serializable;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlSeeAlso;
-import jakarta.xml.bind.annotation.XmlType;
-
-import ua.nure.order.entity.book.Author;
-import ua.nure.order.entity.book.Book;
-
-
-/**
- * <p>Root of any entity hierarchy. Any entity stored in database must have id.
- * 
- * <p>Java class for Entity complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained 
- * within this class.
- * 
- * <pre>
- * &lt;complexType name="Entity">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}int" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
- * </pre>
- * 
- * 
- */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Entity")
-@XmlSeeAlso({
-    Book.class,
-    Author.class
-})
 public class Entity implements Serializable {
 
 	public Entity() {
@@ -57,7 +21,6 @@ public class Entity implements Serializable {
 		this.id = id;
 	}
 
-	@XmlAttribute(name = "id")
 	protected Integer id;
 
 	/**
